@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"time"
+	"fmt"
 
 	"github.com/tarantool/tarantool-operator/pkg/topology/transport/podexec/cli"
 	v1 "k8s.io/api/core/v1"
