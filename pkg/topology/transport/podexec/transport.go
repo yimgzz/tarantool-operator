@@ -16,6 +16,8 @@ const (
 	resource       = "pods"
 	subResource    = "exec"
 	defaultTimeout = 2 * time.Second
+	// use this pod annotation to set cartridge container name if pod has sidecars
+	cartridgeContainerNameAnnotation = "tarantool.io/cartridge-container-name"
 )
 
 type PodExec struct {
@@ -32,6 +34,17 @@ func (r *PodExec) Exec(ctx context.Context, pod *v1.Pod, res interface{}, lua st
 	command, err := r.CLI.CreateCommand(lua, args...)
 	if err != nil {
 		return err
+	}
+
+	// if pod has more than 1 container use annotation to get cartridge container name
+	if len(pod.Spec.Containers) > 1 {
+		cartridgeContainerName, ok := pod.Annotations[cartridgeContainerNameAnnotation]
+
+		if !ok {
+			return fmt.Errorf("pod %s contains more than one container. use pod annotation %s to set cartridge container name", pod.GetName(), cartridgeContainerNameAnnotation)
+		}
+
+		r.ContainerName = cartridgeContainerName
 	}
 
 	stdout, err := r.execShellCommand(ctx, command, pod.GetName(), pod.GetNamespace())
