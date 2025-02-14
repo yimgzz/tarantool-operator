@@ -102,13 +102,13 @@ func (r *CommonCartridgeTopology) SetWeight(ctx context.Context, leader *v1.Pod,
 		local uuid, weight = ...
 
 		local replicaset = cartridge.admin_get_replicasets(uuid)[1]
-		local actualWight = 0
+		local actualWeight = 0
 
-		if replicaset ~= nil and replicaset.weight ~= nil and actualWight ~= box.NULL then
-			actualWight = replicaset.weight
+		if replicaset ~= nil and replicaset.weight ~= nil and actualWeight ~= box.NULL then
+			actualWeight = replicaset.weight
 		end
 
-    	if replicaset == nil or actualWight ~= weight then
+    	if replicaset == nil or actualWeight ~= weight then
 			local topology, err =  cartridge.admin_edit_topology({
 				replicasets = {
 					{ uuid = uuid , weight = weight}
@@ -223,11 +223,11 @@ func (r *CommonCartridgeTopology) GetRolesHierarchy(ctx context.Context, leader 
 	lua := `
 		local roles = require('cartridge.roles')
 		local hierarchy = {}
-	
+
 		for _, roleName in pairs(roles.get_all_roles()) do
 			hierarchy[roleName] = roles.get_role_dependencies(roleName)
 		end
-	
+
 		return hierarchy
 	`
 
@@ -324,7 +324,7 @@ func (r *CommonCartridgeTopology) GetCartridgeConfig(ctx context.Context, leader
 			['vshard_groups.yml'] = true,
 			['schema.yml'] = true,
 		}
-	
+
 		local ret = {}
 		for section, data in pairs(cfg) do
 			if not blacklist[section] then
