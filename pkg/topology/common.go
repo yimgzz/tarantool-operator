@@ -102,6 +102,21 @@ func (r *CommonCartridgeTopology) SetWeight(ctx context.Context, leader *v1.Pod,
 		local uuid, weight = ...
 
 		local replicaset = cartridge.admin_get_replicasets(uuid)[1]
+
+		--setting weights only for vhsard storages
+		local isVshardStorage = false
+
+		for _, role in ipairs(replicaset.roles) do
+			if role == "vshard-storage" then
+				isVshardStorage = true
+				break
+			end
+		end
+
+		if not isVshardStorage then
+			return { res=true, err=nil }
+		end
+
 		local actualWeight = 0
 
 		if replicaset ~= nil and replicaset.weight ~= nil and actualWeight ~= box.NULL then
